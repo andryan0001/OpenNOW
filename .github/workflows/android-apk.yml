@@ -131,10 +131,10 @@ jobs:
           "${apksigner}" verify --verbose --print-certs "${signed}" | tee dist/apk-signature.txt
 
           if [ -n "${EXPECTED_CERT_SHA256:-}" ]; then
-            actual="$("${apksigner}" verify --print-certs "${signed}" | awk -F': ' '/SHA-256 digest/ {print $2; exit}' | tr -d ':' | tr 'A-F' 'a-f')"
-            expected="$(printf '%s' "${EXPECTED_CERT_SHA256}" | tr -d ':' | tr 'A-F' 'a-f')"
-            if [ "${actual}" != "${expected}" ]; then
-              echo "::error::Signing certificate mismatch: expected ${expected}, got ${actual}"
+            actual="$("${apksigner}" verify --print-certs "${signed}" | grep -oE '[0-9a-fA-F]{64}' | head -n 1 | tr 'A-F' 'a-f')"
+            expected="$(printf '%s' "${EXPECTED_CERT_SHA256}" | tr -d ':' | tr -d '[:space:]' | tr 'A-F' 'a-f')"
+            if [ -z "${actual}" ] || [ "${actual}" != "${expected}" ]; then
+              echo "::error::Signing certificate mismatch: expected ${expected}, got ${actual:-<none>}"
               exit 1
             fi
           fi
