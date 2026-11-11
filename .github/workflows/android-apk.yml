@@ -104,11 +104,16 @@ jobs:
           zipalign="${build_tools}/zipalign"
           apksigner="${build_tools}/apksigner"
 
-          unsigned="app/build/outputs/apk/release/app-release-unsigned.apk"
+          apk_dir="android/app/build/outputs/apk/release"
+          unsigned="${apk_dir}/app-release-unsigned.apk"
+          if [ ! -f "${unsigned}" ]; then
+            unsigned="$(find "${apk_dir}" -maxdepth 1 -type f -name '*.apk' ! -name '*.idsig' | head -n 1)"
+          fi
           aligned="${RUNNER_TEMP}/opennow-aligned.apk"
           signed="${RUNNER_TEMP}/opennow-signed.apk"
-          if [ ! -f "${unsigned}" ]; then
-            echo "::error::Expected unsigned release APK at ${unsigned}"
+          if [ -z "${unsigned}" ] || [ ! -f "${unsigned}" ]; then
+            echo "::error::No release APK found in ${apk_dir}"
+            find android/app/build/outputs -maxdepth 3 -type f | head -40
             exit 1
           fi
 
