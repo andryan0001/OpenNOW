@@ -69,6 +69,10 @@ jobs:
 
       - name: Build release APK
         working-directory: android
+        env:
+          # CMake 4.x rejects cmake_minimum_required(VERSION <3.5), which the Opus
+          # CMakeLists vendored by audiopus_sys still declares.
+          CMAKE_POLICY_VERSION_MINIMUM: "3.5"
         run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
 
       - name: Decode signing keystore
