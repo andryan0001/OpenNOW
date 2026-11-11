@@ -46,11 +46,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # Accepts SDK licenses, so AGP can install the build-tools, NDK, and CMake it needs.
+      # Accepts SDK licenses, so AGP can install the exact platform (android-37.x),
+      # build-tools, NDK, and CMake versions it resolves from the project configuration.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platforms;android-37"
           log-accepted-android-sdk-licenses: false
 
       - name: Set up Gradle
